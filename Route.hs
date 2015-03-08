@@ -90,10 +90,9 @@ f7 = advances ((0,0),North) [Forward, Forward, Left, Forward, Right]
 
 -- 経路探索問題解きたくなってきた
 permutations' ::  [a] -> Int -> [[a]]
-permutations' = func []
+permutations' = func [[]]
   where
     func acc _ 0 = acc
-    func [] xs i = func [[]] xs i
     func acc xs i = (func [ (x:ys) | x <- xs, ys <- acc ] xs (i-1)) ++ acc
 
 -- ある場所にいけるn手以内の全経路（アルゴリズムは力技）
@@ -133,22 +132,25 @@ go adv = return((0,0),North) >>= forward' >>= forward' >>= adv >>= forward' >>= 
 -- [POINT] 途中で解なしになるかもしれない計算(範囲外など)
 f11 :: Maybe Status
 f12 :: Maybe Status
-f11 = go $ \st -> Just (left st)
-f12 = go $ \st -> Nothing
+f13 :: Maybe Status
+f12 = go $ \st -> Just (left st)
+f11 = go $ \st -> Just (backward st)
+f13 = go $ \st -> Nothing
 
 -- [POINT] 解が複数ある計算
-f13 :: [Status]
 f14 :: [Status]
 f15 :: [Status]
-f13 = go $ \st -> [left st,right st]
-f14 = go $ \st -> [left st]
-f15 = go $ \st -> []
+f16 :: [Status]
+f14 = go $ \st -> [left st,backward st]
+f15 = go $ \st -> [left st]
+f16 = go $ \st -> []
 
 -- [POINT] 外部からの入力で解が変わる計算
-f16 :: IO Status
-f16 = go $ \st -> getLine >>= \line -> return (read line :: Direction) >>= \dir -> return (advance dir st)
-f16' :: IO Status
-f16' = go $ \st-> do
+f17 :: IO Status
+f17 = go $ \st -> getLine >>= \line -> return (read line :: Direction) >>= \dir -> return (advance dir st)
+
+f17' :: IO Status
+f17' = go $ \st-> do
   line <- getLine
   return $ advance (read line :: Direction) st
 
@@ -169,6 +171,7 @@ main = do
   print f13
   print f14
   print f15
-  f16 >>= \st -> print st
-  f16' >>= \st -> print st
+  print f16
+  f17 >>= \st -> print st
+  f17' >>= \st -> print st
 
