@@ -111,7 +111,7 @@ f8 = routes ((0,0),North) (2,3) 7
 
 
 --
--- 非決定的な計算への対応
+-- 非決定的な計算への対応(強い型なので)
 --
 forward' :: Monad m => Status -> m Status
 forward' = \x -> return $ forward x
@@ -127,30 +127,30 @@ f10 = return((0,0),North) >>= forward' >>= forward' >>= left' >>= forward' >>= r
 
 
 
-go :: Monad m => (Status -> m Status) -> (m Status)
+go :: Monad m => (Status -> m Status) -> m Status
 go adv = return((0,0),North) >>= forward' >>= forward' >>= adv >>= forward' >>= right'
 
 -- [POINT] 途中で解なしになるかもしれない計算(範囲外など)
 f11 :: Maybe Status
 f12 :: Maybe Status
-f11 = go $ \st-> Just (left st)
-f12 = go $ \st-> Nothing
+f11 = go $ \st -> Just (left st)
+f12 = go $ \st -> Nothing
 
 -- [POINT] 解が複数ある計算
 f13 :: [Status]
 f14 :: [Status]
 f15 :: [Status]
-f13 = go $ \st-> [left st,right st]
-f14 = go $ \st-> [left st]
-f15 = go $ \st-> []
+f13 = go $ \st -> [left st,right st]
+f14 = go $ \st -> [left st]
+f15 = go $ \st -> []
 
 -- [POINT] 外部からの入力で解が変わる計算
 f16 :: IO Status
-f16 = go $ \st-> getLine >>= \line -> return (read line :: Direction) >>= \dir -> return ( advance dir st )
+f16 = go $ \st -> getLine >>= \line -> return (read line :: Direction) >>= \dir -> return (advance dir st)
 f16' :: IO Status
 f16' = go $ \st-> do
   line <- getLine
-  return ( advance (read line :: Direction) st )
+  return $ advance (read line :: Direction) st
 
 
 main :: IO()
@@ -170,4 +170,5 @@ main = do
   print f14
   print f15
   f16 >>= \st -> print st
+  f16' >>= \st -> print st
 
