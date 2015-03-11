@@ -199,7 +199,7 @@ rightM :: Monad m => Status -> m Status
 rightM = \st -> return $ right st
 
 
--- 今までと同じようにも使える
+-- 今までと同じようにも使える( 前 - 前 - 右 - 前 - 左 )
 ex5a :: Monad m => m Status
 ex5a = return((0,0),North) >>= forwardM >>= forwardM >>= rightM >>= forwardM >>= leftM
 -- ((2,3),North)
@@ -213,7 +213,9 @@ go turn = return((0,0),North) >>= forwardM >>= forwardM >>= turn >>= forwardM >>
 
 
 --
--- [New!!] 答えがないかもしれない計算（途中で範囲外になったとか）
+-- [New!!] 答えがないかもしれない計算（ターニングポイントが未定なら結果も未定）
+--
+-- 移動できる範囲を決める場合などに範囲外に出たケースなどで使えそう
 --
 ex6a :: Maybe Status
 ex6b :: Maybe Status
@@ -225,14 +227,13 @@ ex6a = go $ \st -> Just (right st)
 ex6b = go $ \st -> Just (backward st)
 -- Just ((1,0),East)
 
--- ターニングポイントで"解なし"になると式全体も"解なし"になる
 ex6c = go $ \st -> Nothing
 -- Nothing
 
 
 
 --
--- [New!!] 解が複数ある計算（パラメータをリストで与えると結果もリストで返ってくる）
+-- [New!!] 答えが複数ある計算（複数のターニングポイントを一挙に計算）
 --
 ex7a :: [Status]
 ex7b :: [Status]
@@ -249,14 +250,14 @@ ex7c = go $ \st -> []
 
 
 
-
+-- 入力を "移動方向"型に変換
 getDirection :: IO Direction
 getDirection = getLine >>= \line -> return ( read line :: Direction )
 
 ex8a :: IO Status
-ex8a = go $ do \st -> getDirection >>= \dir -> return (advance dir st)
+ex8a = go $ \st -> getDirection >>= \dir -> return (advance dir st)
 -- 入力待ちになるので "Forward" "Backward" "Left" "Right" などを入力
--- ターニングポイントが入力した移動方向だった時の計算が行われる
+-- ターニングポイントが入力した移動方向だったときの計算が行われる
 
 -- わかりやすく書くとこう
 ex8b :: IO Status
