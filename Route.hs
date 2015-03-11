@@ -167,6 +167,7 @@ ex4b = permutations' [1,2,3] 4
 
 
 -- ある場所にいけるn手以内の全経路（アルゴリズムは総当たりです...）
+-- 経路 :: 初期状態 -> 目的地@(X座標,Y座標) -> 最大手数 -> [経路]
 routes :: Status -> (Int,Int) -> Int -> [[Direction]]
 routes start goal max = filter (\ds-> (advances start ds) `isReachable` goal )
                         $ permutations' [Forward ..] max
@@ -250,7 +251,11 @@ ex7c = go $ \st -> []
 
 
 
--- 入力を "移動方向"型に変換
+---
+--- ユーザーの入力をターニングポイントに反映
+---
+
+-- 文字列入力を "移動方向"型に変換
 getDirection :: IO Direction
 getDirection = getLine >>= \line -> return ( read line :: Direction )
 
